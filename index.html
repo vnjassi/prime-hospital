@@ -681,3 +681,117 @@
   <!-- no missing images, no broken CDN, all interactive elements work -->
 </body>
 </html>
+
+// Add this script at the end of your HTML file
+<script>
+// API Base URL
+const API_URL = 'http://localhost:5000/api';
+
+// Book Appointment
+async function bookAppointment(formData) {
+  try {
+    const response = await fetch(`${API_URL}/appointments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData)
+    });
+    
+    const data = await response.json();
+    if (data.success) {
+      alert(`Appointment booked successfully! ID: ${data.data.appointmentId}`);
+    } else {
+      alert('Error: ' + data.message);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Failed to book appointment');
+  }
+}
+
+// Submit Contact Form
+async function submitContact(formData) {
+  try {
+    const response = await fetch(`${API_URL}/contact`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData)
+    });
+    
+    const data = await response.json();
+    if (data.success) {
+      alert(`Message sent! Ticket ID: ${data.data.ticketId}`);
+    } else {
+      alert('Error: ' + data.message);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Failed to send message');
+  }
+}
+
+// Check Available Slots
+async function checkAvailableSlots(date, department) {
+  try {
+    const response = await fetch(`${API_URL}/appointments/slots?date=${date}&department=${department}`);
+    const data = await response.json();
+    if (data.success) {
+      console.log('Available slots:', data.data.availableSlots);
+      return data.data.availableSlots;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+// Add event listeners to your buttons
+document.addEventListener('DOMContentLoaded', function() {
+  // Update book appointment button
+  const bookBtn = document.querySelector('.btn-primary');
+  if (bookBtn) {
+    bookBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      // Collect form data (you'll need to create a form)
+      const formData = {
+        patientName: prompt('Enter your name:'),
+        patientEmail: prompt('Enter your email:'),
+        patientPhone: prompt('Enter your phone:'),
+        patientAge: prompt('Enter your age:'),
+        gender: prompt('Enter gender (Male/Female/Other):'),
+        department: prompt('Enter department:'),
+        doctor: prompt('Enter doctor name:'),
+        appointmentDate: prompt('Enter date (YYYY-MM-DD):'),
+        appointmentTime: prompt('Enter time:'),
+        symptoms: prompt('Describe symptoms:'),
+        isFirstVisit: confirm('First visit? Click OK for Yes, Cancel for No')
+      };
+      
+      if (formData.patientName) {
+        bookAppointment(formData);
+      }
+    });
+  }
+  
+  // Update contact button
+  const contactBtn = document.querySelector('.btn-outline');
+  if (contactBtn && contactBtn.textContent.includes('+91')) {
+    contactBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const contactData = {
+        name: prompt('Enter your name:'),
+        email: prompt('Enter your email:'),
+        phone: prompt('Enter your phone:'),
+        subject: prompt('Enter subject (General Inquiry/Appointment/Emergency/Feedback/Complaint/Others):'),
+        message: prompt('Enter your message:')
+      };
+      
+      if (contactData.name) {
+        submitContact(contactData);
+      }
+    });
+  }
+});
+</script>
